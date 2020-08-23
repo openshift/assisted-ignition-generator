@@ -36,16 +36,18 @@ pipeline {
 
      }
   }
-      post {
-          failure {
-              script {
-                  if (env.BRANCH_NAME == 'master')
-                      stage('notify master branch fail') {
-                          withCredentials([string(credentialsId: 'slack-token', variable: 'TOKEN')]) {
-                              sh '''curl -X POST -H 'Content-type: application/json' --data '{"text":"Attention! master branch push integration failed, Check $BUILD_URL"}' https://hooks.slack.com/services/${TOKEN}'''
-                      }
-                  }
-              }
-          }
-      }
+  post {
+    failure {
+        script {
+            if (env.BRANCH_NAME == 'master')
+                stage('notify master branch fail') {
+                    withCredentials([string(credentialsId: 'slack-token', variable: 'TOKEN')]) {
+                        echo '{"text":"Attention! assisted-ignition-generator branch  test failed, see: ' > data.txt
+                        echo ${BUILD_URL} >> data.txt
+                        echo '"}' >> data.txt
+                    }
+                }
+        }
+    }
+  }
 }
