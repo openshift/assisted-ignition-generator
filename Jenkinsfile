@@ -1,6 +1,12 @@
+String cron_string = BRANCH_NAME == "master" ? "@daily" : ""
+
 pipeline {
+  options { timeout(time: 1, unit: 'HOURS') }
+  triggers { cron(cron_string) }
   environment {
             GENERATOR = 'quay.io/ocpmetal/assisted-ignition-generator'
+            SLACK_TOKEN = credentials('slack-token')
+            MASTER_SLACK_TOKEN = credentials('slack_master_token')
   }
   agent {
     node {
@@ -41,14 +47,11 @@ pipeline {
         script {
             if (env.BRANCH_NAME == 'master')
                 stage('notify master branch fail') {
-                    withCredentials([string(credentialsId: 'slack-token', variable: 'TOKEN')]) {
                         script {
                             def data = [text: "Attention! assisted-ignition-generator branch  test failed, see: ${BUILD_URL}"]
                             writeJSON(file: 'data.txt', json: data, pretty: 4)
                         }
-                        sh '''curl -X POST -H 'Content-type: application/json' --data-binary "@data.txt"  https://hooks.slack.com/services/$TOKEN'''
-
-                    }
+                        sh '''curl -X POST -H 'Content-type: application/json' --data-binary "@data.txt"  https://hooks.slack.com/services/$MASTER_SLACK_TOKEN'''
                 }
         }
     }
