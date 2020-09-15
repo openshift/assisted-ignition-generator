@@ -58,3 +58,4 @@ Testing can be done in 2 stages:
    b) Test code that changes the ignitions:
 
       skipper run python3 test_bmh_annotations.py
+
