@@ -42,9 +42,9 @@ pipeline {
      }
   }
   post {
-    failure {
+    always {
         script {
-            if (env.BRANCH_NAME == 'master')
+            if ((env.BRANCH_NAME == 'master') && (currentBuild.currentResult == "ABORTED" || currentBuild.currentResult == "FAILURE")){
                 stage('notify master branch fail') {
                         script {
                             def data = [text: "Attention! assisted-ignition-generator branch  test failed, see: ${BUILD_URL}"]
@@ -52,6 +52,7 @@ pipeline {
                         }
                         sh '''curl -X POST -H 'Content-type: application/json' --data-binary "@data.txt"  https://hooks.slack.com/services/${SLACK_TOKEN}'''
                 }
+            }
         }
     }
   }
