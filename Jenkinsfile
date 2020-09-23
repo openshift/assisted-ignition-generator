@@ -9,14 +9,14 @@ pipeline {
   }
   agent {
     node {
-      label 'host'
+      label 'centos_worker'
     }
 
   }
   stages {
     stage('build') {
       steps {
-        sh 'docker image prune -a -f'
+    
         sh 'make build-image'
       }
     }
